@@ -1,0 +1,2 @@
+-- Seed data for local development (runs on `supabase db reset`).
+-- Intentionally empty: add seed rows once the DB schema is defined.

@@ -1,0 +1,29 @@
+# Minimal Supabase CLI config (hand-written; `supabase init` was unavailable).
+# Run `supabase init` / `supabase start` after installing the CLI to expand it.
+project_id = "teachme-server"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+
+[db]
+port = 54322
+major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[functions.materials]
+verify_jwt = true
+
+[functions.sessions]
+verify_jwt = true
+
+[functions.shorts]
+verify_jwt = true
+
+# Called by Creatomate, not by a signed-in user.
+[functions.creatomate-webhook]
+verify_jwt = false
