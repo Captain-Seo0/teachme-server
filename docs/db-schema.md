@@ -12,10 +12,14 @@
 
 | 값 | 화면 문구 | 매칭되는 `ai_student` |
 | --- | --- | --- |
-| `just_for_fun` | 다 필요 없고 재미가 최고예요 | `dapdapi` (답답이) |
-| `cant_explain_terms` | 용어는 외웠는데 설명이 안 돼요 | `chorongi` (초롱이) |
+| `just_for_fun` | 다 필요 없고 재미가 최고예요 | `chorongi` (초롱이) |
+| `cant_explain_terms` | 용어는 외웠는데 설명이 안 돼요 | `dapdapi` (답답이) |
 | `confused_causality` | 개념은 아는데 인과관계가 헷갈려요 | `ttokttogi` (똑똑이) |
 | `trips_on_tricky_questions` | 응용·함정 문제만 나오면 틀려요 | `kkanjogi` (깐족이) |
+
+- 이 매핑은 Figma 기준이다. `20261127000000_create_profiles.sql`의 주석에는 정정 전 매핑이 남아 있지만, 기존 마이그레이션은 수정하지 않으므로 이 문서가 기준이다.
+- DB에는 `study_concern`과 `matched_student`의 짝을 강제하는 제약이 없다. 매핑은 앱이 적용하며, `matched_student`는 이후 자유롭게 바꿀 수 있다.
+- 정정 전 매핑(`just_for_fun`→`dapdapi`, `cant_explain_terms`→`chorongi`)으로 저장된 기존 테스트 행이 있을 수 있다. 필요하면 `matched_student`를 직접 고친다.
 
 ### `ai_student` (AI 학생)
 
