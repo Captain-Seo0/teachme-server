@@ -24,6 +24,9 @@ verify_jwt = true
 [functions.shorts]
 verify_jwt = true
 
+[functions.schools]
+verify_jwt = true
+
 # Called by Creatomate, not by a signed-in user.
 [functions.creatomate-webhook]
 verify_jwt = false
