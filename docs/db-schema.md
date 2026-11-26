@@ -33,11 +33,20 @@
 | `nickname` | text | not null, 2~20자, 앞뒤 공백 불가, `lower(nickname)` 유니크 | 활동명 (대소문자 구분 없이 중복 불가) |
 | `avatar` | text | not null, 1~50자 | 아바타 식별자 |
 | `school_name` | text | not null, 1~50자, 앞뒤 공백 불가 | 학교 이름 |
+| `school_code` | text | null 허용 | NEIS 표준 학교 코드. 목록에서 못 찾아 직접 입력하면 null |
+| `school_kind` | text | null 허용 | `중학교` / `고등학교` (NEIS 값). 직접 입력이면 null |
 | `grade` | smallint | not null, 1~3 | 학년 |
 | `study_concern` | `study_concern` | not null | 공부 고민 |
 | `matched_student` | `ai_student` | not null | 매칭된 AI 학생 (이후 변경 가능) |
 | `created_at` | timestamptz | not null, default `now()` | 생성 시각 |
 | `updated_at` | timestamptz | not null, default `now()` | 수정 시각 (update 트리거로 갱신) |
+
+**인덱스**
+
+| 이름 | 대상 | 용도 |
+| --- | --- | --- |
+| `profiles_nickname_lower_key` | `lower(nickname)` unique | 닉네임 중복 방지 |
+| `profiles_school_code_idx` | `school_code` (where `school_code is not null`) | "우리 학교" 피드 조회 |
 
 **RLS** (대상 role: `authenticated`)
 
