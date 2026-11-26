@@ -39,8 +39,9 @@
 ## 구조
 
 - `supabase/functions/_shared/` — `ai.ts`, `supabase.ts`, `cors.ts`, `errors.ts`, `prompts/`
+- `supabase/functions/schools/index.ts` — NEIS 학교 검색 (구현됨)
 - `supabase/functions/{materials,sessions,shorts,creatomate-webhook}/index.ts` — 현재 501 stub
-- `supabase/migrations/` — 마이그레이션 (현재 확장 활성화만)
+- `supabase/migrations/` — 마이그레이션 (확장, profiles)
 - `docs/` — 기획서, API 명세, DB 스키마
 
 ## Edge Function 작성 규칙
