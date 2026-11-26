@@ -43,9 +43,9 @@
 | `avatar` | text | not null, 1~50자 | 기본 아바타 색 식별자. 허용값 `mint` / `peach` / `sky` / `lemon` (앱 규약, DB는 길이만 검사). 프로필 사진이 없을 때 대체로 사용 |
 | `avatar_url` | text | null 허용 | 프로필 사진 URL (`avatars` 버킷). null이면 `avatar` 색을 표시 |
 | `student_type` | `student_type` | null 허용 | 학생 구분. 기존 row 때문에 nullable이며 신규 가입은 클라이언트에서 필수로 받는다 |
-| `school_name` | text | not null, 1~50자, 앞뒤 공백 불가 | 학교 이름 |
-| `school_code` | text | null 허용 | NEIS 표준 학교 코드. 목록에서 못 찾아 직접 입력하면 null |
-| `school_kind` | text | null 허용 | `중학교` / `고등학교` (NEIS 값). 직접 입력이면 null |
+| `school_name` | text | null 허용, 값이 있으면 1~50자·앞뒤 공백 불가 (`profiles_school_name_check`) | 학교 이름. `student_type`에 따라 필수 여부가 달라진다(아래 참고) |
+| `school_code` | text | null 허용, `school_name`이 null이면 null | NEIS 표준 학교 코드. 목록에서 못 찾아 직접 입력하면 null |
+| `school_kind` | text | null 허용, `school_name`이 null이면 null | `중학교` / `고등학교` (NEIS 값). 직접 입력이면 null |
 | `grade` | smallint | null 허용, 값이 있으면 1~3 (`profiles_grade_check`) | 학년. `student_type`에 따라 필수 여부가 달라진다(아래 참고) |
 | `study_concern` | `study_concern` | not null | 공부 고민 |
 | `matched_student` | `ai_student` | not null | 매칭된 AI 학생 (이후 변경 가능) |
@@ -66,6 +66,19 @@
 | `middle_school`, `high_school` | 필수 (1~3) |
 | `repeat_exam_taker`, `general` | 반드시 null |
 | null (기존 row) | 제약 없음 |
+
+**`school_name`과 `student_type`의 관계** (`profiles_school_requires_student_type`)
+
+| `student_type` | `school_name` |
+| --- | --- |
+| `middle_school`, `high_school` | 필수 |
+| `repeat_exam_taker`, `general` | 선택 (null이어도, 값이 있어도 됨) |
+| null (기존 row) | 제약 없음 |
+
+**학교 컬럼 간 관계** (`profiles_school_link_requires_name`)
+
+- `school_name`이 null이면 `school_code`, `school_kind`도 모두 null이어야 한다.
+- `school_name`이 있어도 직접 입력이면 `school_code`, `school_kind`는 둘 다 null일 수 있다.
 
 **RLS** (대상 role: `authenticated`)
 
