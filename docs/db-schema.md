@@ -21,6 +21,15 @@
 
 `dapdapi` · `chorongi` · `ttokttogi` · `kkanjogi`
 
+### `student_type` (학생 구분)
+
+| 값 | 의미 |
+| --- | --- |
+| `middle_school` | 중학생 |
+| `high_school` | 고등학생 |
+| `repeat_exam_taker` | N수생 |
+| `general` | 일반인 |
+
 ## 테이블
 
 ### `profiles`
@@ -31,7 +40,9 @@
 | --- | --- | --- | --- |
 | `id` | uuid | PK, `auth.users(id)` 참조, on delete cascade | 사용자 ID |
 | `nickname` | text | not null, 2~20자, 앞뒤 공백 불가, `lower(nickname)` 유니크 | 활동명 (대소문자 구분 없이 중복 불가) |
-| `avatar` | text | not null, 1~50자 | 아바타 식별자 |
+| `avatar` | text | not null, 1~50자 | 기본 아바타 색 식별자. 허용값 `mint` / `peach` / `sky` / `lemon` (앱 규약, DB는 길이만 검사). 프로필 사진이 없을 때 대체로 사용 |
+| `avatar_url` | text | null 허용 | 프로필 사진 URL (`avatars` 버킷). null이면 `avatar` 색을 표시 |
+| `student_type` | `student_type` | null 허용 | 학생 구분. 기존 row 때문에 nullable이며 신규 가입은 클라이언트에서 필수로 받는다 |
 | `school_name` | text | not null, 1~50자, 앞뒤 공백 불가 | 학교 이름 |
 | `school_code` | text | null 허용 | NEIS 표준 학교 코드. 목록에서 못 찾아 직접 입력하면 null |
 | `school_kind` | text | null 허용 | `중학교` / `고등학교` (NEIS 값). 직접 입력이면 null |
@@ -58,6 +69,30 @@
 | delete | 정책 없음 → 차단 (`auth.users` 삭제 시 cascade로만 삭제) |
 
 다른 사용자의 프로필 공개 조회는 티치톡 단계에서 별도 마이그레이션으로 추가한다.
+
+## Storage
+
+### `avatars` 버킷 (프로필 사진)
+
+| 항목 | 값 |
+| --- | --- |
+| 공개 여부 | public (URL로 누구나 읽기 가능) |
+| 경로 규칙 | `{user_id}/avatar.jpg` |
+| 파일 크기 | 최대 2MB |
+| MIME 타입 | `image/jpeg`, `image/png`, `image/webp` |
+
+`storage.objects` RLS (대상 role: `authenticated`, 조건: 첫 폴더 이름 = `auth.uid()`)
+
+| 정책 | 동작 |
+| --- | --- |
+| `avatars_select_own` | 본인 폴더 조회 (upsert에 필요) |
+| `avatars_insert_own` | 본인 폴더에 업로드 |
+| `avatars_update_own` | 본인 폴더 파일 수정(덮어쓰기) |
+| `avatars_delete_own` | 본인 폴더 파일 삭제 |
+
+- 폴더 이름만 검사하며 파일명(`avatar.jpg`)과 확장자는 DB가 강제하지 않는다. 클라이언트가 규칙을 지킨다.
+- anon용 select 정책이 없으므로 Storage API로 다른 사용자의 폴더 목록(user id)을 나열할 수 없다. 파일 URL을 알면 public 버킷이라 읽을 수 있다.
+- 업로드 후 `profiles.avatar_url`에 공개 URL을 저장한다. 같은 경로를 덮어쓰면 URL이 같으므로 캐시 우회용 쿼리 문자열(`?v=`)은 앱에서 붙인다.
 
 ## 함수
 
